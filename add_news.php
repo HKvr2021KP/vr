@@ -1,31 +1,32 @@
 <?php
-
-	require_once "../../../conf.php";							// paneme juhise kus on serveri andmed/paroolid kus andmed asuvad
+	require_once "usesession.php";		// ainult sisseloginud kasutajale
+	require_once "../../../conf.php";	
+	require_once "fnc_general.php";							// paneme juhise kus on serveri andmed/paroolid kus andmed asuvad
 	//echo $server_host;
 	$news_input_error = null;
+	$titleSave = null;
+	$contentSave = null;
+	$authorSave = null; 
 	//var_dump($_POST);											// On olemas ka $_GET		// näitab kõiki postitusi
-	$titleSave = null; 		// pealkirja väli
-	$contentSave = null; 	// sisu väli
-	$authorSave = null;		// autori siu
+
 	if(isset($_POST["news_submit"])){
 		if(empty($_POST["news_title_input"])){
 			$news_input_error = "Uudise pealkiri on puudu! ";
-			$contentSave = (isset($_POST['news_content_input']) ? $_POST['news_content_input'] : ''); // väärtus, mis salvestatakse pealkirja meeldejätmiseks
-			$authorSave = (isset($_POST['news_author_input']) ? $_POST['news_author_input'] : '');
+		} else {
+			$news_title = test_input($_POST["news_title_input"]);
 		}
 		if(empty($_POST["news_content_input"])){
-		$news_input_error .= "Uudise tekst on puudu! ";		//.= võta senine ja pane juurde
-		$titleSave = (isset($_POST['news_title_input']) ? $_POST['news_title_input'] : ''); // väärtus, mis salvestatakse sisu meeldejätmiseks
-		$authorSave = (isset($_POST['news_author_input']) ? $_POST['news_author_input'] : '');
+			$news_input_error .= "Uudise tekst on puudu!";
+		} else {
+			$news_content = test_input($_POST["news_content_input"]);
 		}
-
-		// valideerime sisendandmed
-		if(empty($news_input_error)){	
-			$news_title_input = test_input($_POST["news_title_input"]);
-			$news_content_input = test_input($_POST["news_content_input"]);
-			$news_author_input = test_input($_POST["news_author_input"]);
-			//Salvestame andmebaasi
-			store_news("news_title_input", "news_content_input", "news_author_input");
+		if(!empty($_POST["news_author_input"])){
+			$news_author = test_input($_POST["news_author_input"]);
+		}
+		
+		if(empty($news_input_error)){
+			//salvestame andmebaasi
+			store_news($news_title, $news_content, $news_author);
 		}
 	}
 
@@ -46,12 +47,7 @@
 		$stmt -> close();
 		$conn -> close();
 	}
-	function test_input($input) { 		// sisendandmete valideerimise funktsioon
-		$data = trim($input);			// üleliigsed tühikute korrigeerimine
-		$data = stripslashes($input);	// kaldriipsude kaotamine
-		$data = htmlspecialchars($input);	// ülejäänud mudru
-		return $input;
-	  }
+
 
 ?>
 
@@ -72,11 +68,13 @@
 		<label for="news_content_input">Uudise tekst:</label> <br>
 		<textarea name="news_content_input" id="news_content_input" placeholder="Uudise tekst" rows="6" cols="40"><?php echo $contentSave; ?></textarea><br>
 		<br>
-		<label for="news_author_input">Uudise lisaja nimi:</label> <br>
+		<label for="news_author_input">Uudise kirjutaja. </label> <br>
 		<input type="text" id="news_author_input" name="news_author_input" placeholder="Nimi" value="<?php echo $authorSave; ?>"><br><br>
 		<input type="submit" name="news_submit" value="Salvesta uudis!">
 		<br>
 	</form>
 	<p><?php echo $news_input_error; ?></p>
+	<p>Tagasi <a href="page.php">avalehele</a></p>
+	<p><a href="?logout=1">Logi välja</a></p>
 </body>
 </html>

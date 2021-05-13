@@ -1,5 +1,5 @@
 <?php
-
+require_once "usesession.php";			// ainult sisseloginud kasutajale
 require_once "../../../conf.php";
 		
 function read_news() {
@@ -24,11 +24,13 @@ function read_news() {
 	$stmt -> execute();
 	$raw_news_html = null;
 
-	$newsDate = new DateTime($news_added_from_db); // teen andmebaasist võetud kuupäevast dateTime objekti
-	$nDate = $newsDate->format('d.M.Y'); // Teisendan dateTime objekti vajalikku formaati
+	
+	
 
 	while ($stmt -> fetch()) {
 		$raw_news_html .= "\n <h2>" .$news_title_from_db ."</h2>";
+		$newsDate = new DateTime($news_added_from_db); // teen andmebaasist võetud kuupäevast dateTime objekti
+		$nDate = $newsDate->format('d.M.Y'); // Teisendan dateTime objekti vajalikku formaati
 		$raw_news_html .= "\n <p>Lisatud: " . $news_added_from_db."</p>"; // Väljastan kuupäeva
 		$raw_news_html .= "\n <p>" .nl2br($news_content_from_db) ."</p>";
 		$raw_news_html .= "\n <p>Edastas: ";
@@ -63,5 +65,7 @@ $news_html = read_news();
 <input type="submit" name="count_submit" value="Kuva uudised">
 </form>
 <p><?php echo $news_html; ?></p>
+<p>Tagasi <a href="page.php">avalehele</a></p>
+<p><a href="?logout=1">Logi välja</a></p>
 </body>
 </html>
